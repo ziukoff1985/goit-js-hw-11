@@ -1,8 +1,5 @@
 'use strict';
 
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css'; // Додатковий імпорт стилів
-
 const gallery = document.querySelector('.gallery');
 
 export function createMarkup(arrImages) {

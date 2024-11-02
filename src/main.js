@@ -1,7 +1,7 @@
 'use strict';
 
 import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css'; // Додатковий імпорт стилів
+import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { fetchImages } from './js/pixabay-api';
@@ -9,18 +9,16 @@ import { createMarkup } from './js/render-functions';
 
 let lightbox;
 
-// Знаходимо елементи форми
 const form = document.querySelector('.form');
 const input = document.querySelector('.input');
+const loader = document.querySelector('.loader');
 
-// Додаємо обробник події для форми
 form.addEventListener('submit', handleSubmit);
 
 function handleSubmit(event) {
   event.preventDefault();
 
   const query = input.value.trim();
-  console.log(query);
 
   if (!query) {
     iziToast.error({
@@ -30,9 +28,26 @@ function handleSubmit(event) {
     });
     return;
   }
+
+  loader.style.display = 'block';
+
   fetchImages(query)
     .then(data => {
+      loader.style.display = 'none';
+
+      if (data.hits.length === 0) {
+        iziToast.info({
+          title: 'No Results',
+          message:
+            'Sorry, there are no images matching your search query. Please try again!',
+          position: 'topRight',
+        });
+        form.reset();
+        return;
+      }
+
       createMarkup(data.hits);
+
       if (lightbox) {
         lightbox.refresh();
       } else {
@@ -46,6 +61,7 @@ function handleSubmit(event) {
       }
     })
     .catch(error => {
+      loader.style.display = 'none';
       console.error(error);
     });
 }

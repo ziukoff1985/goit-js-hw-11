@@ -1,8 +1,5 @@
 'use strict';
 
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css'; // Додатковий імпорт стилів
-
 const API_KEY = '46843956-48321f6890b82a65cca7319ef';
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -25,21 +22,6 @@ export function fetchImages(query) {
       return response.json();
     })
     .then(data => {
-      console.log(data);
-
-      if (data.hits.length === 0) {
-        form.reset();
-        iziToast.info({
-          title: 'No Results',
-          message:
-            'Sorry, there are no images matching your search query. Please try again!',
-          position: 'topRight',
-        });
-      } else {
-        console.log(data);
-
-        console.log(data.hits);
-      }
       return data;
     })
     .catch(error => {
