@@ -1,35 +1,69 @@
 'use strict';
 
+// Створюємо константи (змінні):
+// const API_KEY - ключ доступу до API Pixabay. Використовується для ідентифікації запитів, що надсилаються до API, і підтвердження прав доступу.
+// const BASE_URL - базова URL-адреса для доступу (відправлення ззапиту) до Pixabay API, на яку будуть додаватися параметри запиту.
 const API_KEY = '46843956-48321f6890b82a65cca7319ef';
 const BASE_URL = 'https://pixabay.com/api/';
 
+// Створюємо функцію (яку будемо експортувати):
+// Функція fetchImages експортується для використання в файлі main.js.
+// Приймає один параметр 'query', що представляє текст запиту, введений користувачем.
 export function fetchImages(query) {
+  // Оголошуємо змінну searchParams як екземпляр класу URLSearchParams, який полегшує формування рядка параметрів для URL.
   const searchParams = new URLSearchParams({
-    key: API_KEY,
-    q: query,
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: true,
+    key: API_KEY, // параметр 'key' - містить ключ API для автентифікації.
+    q: query, // параметр 'q' - запит на пошук, введений користувачем.
+    image_type: 'photo', // тип зображень, які потрібно отримати ('photo').
+    orientation: 'horizontal', // орієнтація зображень - горизонтальні.
+    safesearch: true, // безпечний пошук - виключаємо неприйнятні зображення
   });
 
+  // Формуємо URL для запиту, використовуючи шаблонні рядки.
+  // Значення 'url' міститиме базовий URL Pixabay API, до якого додаються параметри запиту з об'єкта 'searchParams'.
   const url = `${BASE_URL}?${searchParams}`;
 
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      return data;
-    })
-    .catch(error => {
-      iziToast.error({
-        title: 'Error',
-        message: 'Failed to fetch images. Please try again later.',
-        position: 'topRight',
-      });
-      console.error('There was a problem with the fetch operation:', error);
-    });
+  // Створюємо і повертаємо метод fetch:
+  // Виконуємо HTTP-запит до сформованого URL за допомогою методу fetch, який повертає проміс.
+  return (
+    fetch(url)
+      // // Обробляємо отриману відповідь у методі 'then', який викликається після завершення запиту.
+      // Перший then повертає проміс, який, в свою чергу, буде вирішено значенням, що повертається з response.json()
+      // // Параметр 'response' - це об'єкт відповіді, отриманий від методу fetch і він містить інформацію про відповідь від сервера.
+      .then(response => {
+        // Перевіряємо властивість 'ok' об'єкта 'response'.
+        // Властивість 'ok' є булевою і вказує на успішність запиту:
+        // - true, якщо статус відповіді від 200 до 299 (успішні відповіді)
+        // - false в іншому випадку.
+        if (!response.ok) {
+          // Якщо 'ok' є false, викидаємо новий екземпляр помилки з відповідним повідомленням.
+          throw new Error('Network response was not ok');
+        }
+        // якщо 'response.ok' є true, викликаємо метод 'json()' для перетворення відповіді в формат JSON і повертаємо його (повертає проміс).
+        return response.json();
+      })
+      // Другий метод 'then', який обробляє результат першого 'then'.
+      // Параметр 'data' містить значення, отримане з попереднього промісу (JSON-об'єкт, який був повернутий з response.json()).
+      // Якщо в response.json() немає помилок, то data міститиме об'єкт (або масив об'єктів), отриманий з API.
+      .then(data => {
+        // Повертаємо отримані дані для подальшого використання.
+        return data;
+      })
+      // Обробка помилок з використанням методу catch:
+      // Метод 'catch' обробляє помилки, які виникають у ланцюзі промісів.
+      // Параметр 'error' містить інформацію про помилку, яка сталася під час виконання запиту.
+      //
+      .catch(error => {
+        // Використовуємо бібліотеку iziToast для виводу повідомлення про помилку.
+        iziToast.error({
+          title: 'Error', // Заголовок повідомлення.
+          message: 'Failed to fetch images. Please try again later.', // Текст повідомлення, що інформує користувача про невдалий запит.
+          position: 'topRight', // Розташування повідомлення на екрані.
+        });
+        // Виводимо деталі помилки у консоль для розробників.
+        console.error('There was a problem with the fetch operation:', error);
+      })
+  );
 }
+
+// !!!***!!! результат ПЕРШОГО then - це ПРОМІС, який при успішному виконанні надає data (JSON-дані) для ДРУГОГО then.!!!
